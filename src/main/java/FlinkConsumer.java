@@ -20,7 +20,7 @@ public class FlinkConsumer {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         Properties props = new Properties();
-        props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
         props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-consumer-group");
 
         // Create Kafka consumer

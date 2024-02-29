@@ -1,34 +1,36 @@
 package producer;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
+import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
+import kafka.utils.ZKStringSerializer$;
+import kafka.utils.ZkUtils;
+import org.I0Itec.zkclient.ZkClient;
+import org.I0Itec.zkclient.ZkConnection;
+import org.apache.hadoop.fs.Path; 
+import org.apache.parquet.hadoop.ParquetReader; 
+import org.apache.parquet.example.data.Group; 
+import org.apache.parquet.hadoop.example.GroupReadSupport; 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.parquet.example.data.Group;
-import org.apache.parquet.hadoop.ParquetReader;
-import org.apache.parquet.hadoop.example.GroupReadSupport;
-import org.apache.hadoop.fs.Path;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
+import java.io.IOException; 
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
+
 
 public class Producer {
     private static final Logger logger = LogManager.getLogger(Producer.class);
     private static final String KAFKA_TOPIC = "topic";
-    private static final String KAFKA_SERVER = "localhost:9092";
+    private static final String ZOOKEEPER_SERVER = "zookeeper:32181";
+    private static final String KAFKA_SERVER = "kafka:9092";
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
 
     public static void main(String[] args) {
@@ -68,23 +70,31 @@ public class Producer {
     }
 
     private static void createKafkaTopic() {
-        Properties props = new Properties();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
-        try (AdminClient adminClient = AdminClient.create(props)) {
-            logger.debug("Creating NewTopic object...");
-            NewTopic newTopic = new NewTopic(KAFKA_TOPIC, 1, (short) 1);
-            Future<Void> future = adminClient.createTopics(Collections.singletonList(newTopic)).all();
-            logger.debug("Waiting for topic creation to complete...");
-            future.get();
-            logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
-        } catch (InterruptedException | ExecutionException e) {
-            if (e.getCause() instanceof TopicExistsException) {
-                logger.info("Kafka topic " + KAFKA_TOPIC + " already exists.");
-            } else {
-                logger.error("Failed to create Kafka topic: " + e.getMessage(), e);
+        ZkClient zkClient = null;
+        try {
+            zkClient = new ZkClient(ZOOKEEPER_SERVER, 20000, 20000, ZKStringSerializer$.MODULE$);
+            ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(ZOOKEEPER_SERVER), false);
+            checkAndCreateTopic(zkUtils);
+        } finally {
+            if (zkClient != null) {
+                zkClient.close();
             }
         }
     }
+
+    private static void checkAndCreateTopic(ZkUtils zkUtils) {
+        int partitions = 1;
+        int replication = 1;
+        Properties topicConfig = new Properties();
+
+        if (!AdminUtils.topicExists(zkUtils, KAFKA_TOPIC)) {
+            AdminUtils.createTopic(zkUtils, KAFKA_TOPIC, partitions, replication, topicConfig, RackAwareMode.Safe$.MODULE$);
+            logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
+        } else {
+            logger.info("Kafka topic " + KAFKA_TOPIC + " already exists.");
+        }
+    }
+
 
     private static Properties loadProducerProperties() {
         Properties props = new Properties();
@@ -101,7 +111,7 @@ public class Producer {
                 if (e != null) {
                     logger.error("Failed to send record to Kafka", e);
                 } else {
-                    logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
+                    //logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
                 }
             }
         }));
