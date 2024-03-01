@@ -58,7 +58,8 @@ docker logs 1-kafka-1
 docker logs 1-producer-1
 docker logs 1-consumer-1  
 docker logs 1-zookeeper-1
-docker logs 1-manager-1   
+docker logs 1-manager-1  
+
 
 
 
