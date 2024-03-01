@@ -31,6 +31,7 @@ public class Producer {
     private static final String KAFKA_TOPIC = "topic";
     private static final String ZOOKEEPER_SERVER = "zookeeper:32181";
     private static final String KAFKA_SERVER = "kafka:9092";
+    // Thread pool
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
 
     public static void main(String[] args) {
@@ -50,9 +51,11 @@ public class Producer {
                     if (file.getName().endsWith(".parquet")) {
                         Path path = new Path(file.getAbsolutePath());
 
+                        // Read and process each Parquet file
                         try (ParquetReader<Group> reader = ParquetReader.builder(new GroupReadSupport(), path).build()) {
                             Group record;
                             while ((record = reader.read()) != null) {
+                                // Send each record to Kafka
                                 sendRecordToKafka(producer, record.toString());
                             }
                         }
@@ -69,6 +72,7 @@ public class Producer {
         executorService.shutdown();
     }
 
+    // Check and create Kafka topic
     private static void createKafkaTopic() {
         ZkClient zkClient = null;
         try {
@@ -89,6 +93,7 @@ public class Producer {
         }
     }
 
+    // Load producer properties
     private static Properties loadProducerProperties() {
         Properties props = new Properties();
         props.put("bootstrap.servers", KAFKA_SERVER);
@@ -97,6 +102,7 @@ public class Producer {
         return props;
     }
 
+    // Send record to Kafka
     private static void sendRecordToKafka(KafkaProducer<String, String> producer, String record) {
         executorService.submit(() -> producer.send(new ProducerRecord<>(KAFKA_TOPIC, record), new Callback() {
             @Override

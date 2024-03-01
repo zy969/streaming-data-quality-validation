@@ -25,16 +25,20 @@ public class FlinkConsumer {
         props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-consumer-group");
         logger.info("Connecting to Kafka...");
 
+        // Create a consumer
         FlinkKafkaConsumer010<String> kafkaConsumer = new FlinkKafkaConsumer010<>("topic", new SimpleStringSchema(), props);
         logger.info("Kafka consumer created for topic 'topic'.");
 
+        // Add Kafka consumer as a source 
         DataStream<String> kafkaStream = env.addSource(kafkaConsumer);
         logger.info("Started consuming data from Kafka.");
 
+        // Apply a flatMap transformation
         DataStream<Tuple2<String, Integer>> qualityCheck = kafkaStream.flatMap(new DataQualityValidator());
         qualityCheck.print();
 
         try {
+            // Execute the Flink job
             env.execute("Flink Consumer");
             logger.info("Flink consumer execution started.");
         } catch (Exception e) {
@@ -42,6 +46,7 @@ public class FlinkConsumer {
         }
     }
 
+    // Custom FlatMapFunction for data quality validation
     public static class DataQualityValidator extends RichFlatMapFunction<String, Tuple2<String, Integer>> {
         @Override
         public void open(Configuration parameters) {
