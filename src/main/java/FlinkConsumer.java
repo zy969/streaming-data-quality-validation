@@ -1,8 +1,8 @@
 package consumer;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -31,21 +31,8 @@ public class FlinkConsumer {
         DataStream<String> kafkaStream = env.addSource(kafkaConsumer);
         logger.info("Started consuming data from Kafka.");
 
-
-
-
-
-
-         //简单写了个计算字符数，需要改为质量验证的逻辑
-
-
-
-
-
-
-
-        DataStream<Tuple2<String, Integer>> characterCount = kafkaStream.flatMap(new RichCharacterCount());
-        characterCount.print();
+        DataStream<Tuple2<String, Integer>> qualityCheck = kafkaStream.flatMap(new DataQualityValidator());
+        qualityCheck.print();
 
         try {
             env.execute("Flink Consumer");
@@ -55,28 +42,39 @@ public class FlinkConsumer {
         }
     }
 
-    public static class RichCharacterCount extends RichFlatMapFunction<String, Tuple2<String, Integer>> {
+    public static class DataQualityValidator extends RichFlatMapFunction<String, Tuple2<String, Integer>> {
         @Override
         public void open(Configuration parameters) {
-            logger.info("FlatMap function started.");
+            logger.info("DataQualityValidator started.");
         }
 
         @Override
         public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
-            out.collect(new Tuple2<>(value, value.length()));
-            logger.info("Processed string: " + value + ", Length: " + value.length());
+
+
+
+
+
+
+
+
+            // 实现数据质量验证逻辑
+
+
+
+
+
+
+
+
+
+
+            logger.info("Received string: " + value);
         }
 
         @Override
         public void close() {
-            logger.info("FlatMap function closed.");
+            logger.info("DataQualityValidator function closed.");
         }
     }
 }
-
-
-
-
-
-
-

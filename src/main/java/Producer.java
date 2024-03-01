@@ -74,27 +74,20 @@ public class Producer {
         try {
             zkClient = new ZkClient(ZOOKEEPER_SERVER, 20000, 20000, ZKStringSerializer$.MODULE$);
             ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(ZOOKEEPER_SERVER), false);
-            checkAndCreateTopic(zkUtils);
+            if (!AdminUtils.topicExists(zkUtils, KAFKA_TOPIC)) {
+                AdminUtils.createTopic(zkUtils, KAFKA_TOPIC, 1, 1, new Properties(), RackAwareMode.Safe$.MODULE$);
+                logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
+            } else {
+                logger.info("Kafka topic " + KAFKA_TOPIC + " already exists.");
+            }
+        } catch (Exception e) {
+            logger.error("Exception occurred while creating Kafka topic: ", e);
         } finally {
             if (zkClient != null) {
                 zkClient.close();
             }
         }
     }
-
-    private static void checkAndCreateTopic(ZkUtils zkUtils) {
-        int partitions = 1;
-        int replication = 1;
-        Properties topicConfig = new Properties();
-
-        if (!AdminUtils.topicExists(zkUtils, KAFKA_TOPIC)) {
-            AdminUtils.createTopic(zkUtils, KAFKA_TOPIC, partitions, replication, topicConfig, RackAwareMode.Safe$.MODULE$);
-            logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
-        } else {
-            logger.info("Kafka topic " + KAFKA_TOPIC + " already exists.");
-        }
-    }
-
 
     private static Properties loadProducerProperties() {
         Properties props = new Properties();
