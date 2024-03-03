@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 
@@ -33,6 +35,7 @@ public class Producer {
     private static final String KAFKA_SERVER = "kafka:9092";
     // Thread pool
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void main(String[] args) {
         createKafkaTopic();
@@ -56,7 +59,8 @@ public class Producer {
                             Group record;
                             while ((record = reader.read()) != null) {
                                 // Send each record to Kafka
-                                sendRecordToKafka(producer, record.toString());
+                                 String jsonRecord = convertGroupToJson(record);
+                                sendRecordToKafka(producer, jsonRecord);
                             }
                         }
                     } else {
@@ -114,5 +118,76 @@ public class Producer {
                 }
             }
         }));
+    }
+
+    private static String convertGroupToJson(Group record) {
+        ObjectNode jsonNode = objectMapper.createObjectNode();
+
+        // Handle nullable string fields
+        if (record.getBinary("dispatching_base_num", 0) != null) {
+            jsonNode.put("dispatching_base_num", record.getString("dispatching_base_num", 0));
+        } else {
+            jsonNode.putNull("dispatching_base_num");
+        }
+
+        if (record.getBinary("Affiliated_base_number", 0) != null) {
+            jsonNode.put("Affiliated_base_number", record.getString("Affiliated_base_number", 0));
+        } else {
+            jsonNode.putNull("Affiliated_base_number");
+        }
+
+        // Handle nullable long fields with logicalType timestamp-micros
+        try {
+            long pickupDatetime = record.getLong("pickup_datetime", 0);
+            jsonNode.put("pickup_datetime", pickupDatetime);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("pickup_datetime");
+        }
+
+        try {
+            long dropOffDatetime = record.getLong("dropOff_datetime", 0);
+            jsonNode.put("dropOff_datetime", dropOffDatetime);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("dropOff_datetime");
+        }
+
+        // Handle nullable double fields
+        try {
+            Double PUlocationID = record.getDouble("PUlocationID", 0);
+            if(PUlocationID != null) {
+                jsonNode.put("PUlocationID", PUlocationID);
+            } else {
+                jsonNode.putNull("PUlocationID");
+            }
+        } catch (RuntimeException e) {
+            jsonNode.putNull("PUlocationID");
+        }
+
+        try {
+            Double DOlocationID = record.getDouble("DOlocationID", 0);
+            if(DOlocationID != null) {
+                jsonNode.put("DOlocationID", DOlocationID);
+            } else {
+                jsonNode.putNull("DOlocationID");
+            }
+        } catch (RuntimeException e) {
+            jsonNode.putNull("DOlocationID");
+        }
+
+        // Handle nullable int fields
+        try {
+            Integer srFlag = record.getInteger("SR_Flag", 0);
+            jsonNode.put("SR_Flag", srFlag);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("SR_Flag");
+        }
+
+        // Convert the JSON object to a string
+        try {
+            return objectMapper.writeValueAsString(jsonNode);
+        } catch (IOException e) {
+            logger.error("Failed to convert record to JSON", e);
+            return "{}"; 
+        }
     }
 }

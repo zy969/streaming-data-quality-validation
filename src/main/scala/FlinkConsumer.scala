@@ -14,6 +14,25 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.scala.Logging
 
 import java.util.Properties
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.stefan_grafberger.streamdq.VerificationSuite
+import com.stefan_grafberger.streamdq.anomalydetection.detectors.aggregatedetector.AggregateAnomalyCheck
+import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrategy
+import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck
+import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
+import com.stefan_grafberger.streamdq.VerificationSuite
+
+case class TaxiRide(
+  dispatching_base_num: Option[String],
+  pickup_datetime: Option[Long],
+  dropOff_datetime: Option[Long],
+  PUlocationID: Option[Double],
+  DOlocationID: Option[Double],
+  SR_Flag: Option[Int],
+  Affiliated_base_number: Option[String]
+)
 
 class FlinkConsumer extends RichFlatMapFunction[String, Tuple2[String, Integer]] {
   private val logger = LogManager.getLogger(this.getClass)
