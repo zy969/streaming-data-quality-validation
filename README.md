@@ -25,10 +25,12 @@
     ```bash
     docker build --no-cache -t data-quality-validation .
     ```
-
-docker tag data-quality-validation:latest vic033/data-quality-validation:latest
-
-docker push vic033/data-quality-validation:latest
+    ```bash
+    docker tag data-quality-validation:latest vic033/data-quality-validation:latest
+    ```
+    ```bash
+    docker push vic033/data-quality-validation:latest
+    ```
 
 
 ## Usage
@@ -43,8 +45,9 @@ docker push vic033/data-quality-validation:latest
     ```bash
     docker ps
     ```
-
-docker logs streaming-data-quality-validation-consumer-1 
+    ```bash
+    docker logs streaming-data-quality-validation-consumer-1 
+    ```
 
 3. To stop and remove containers:
     ```bash
