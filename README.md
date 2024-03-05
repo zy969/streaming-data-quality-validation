@@ -16,9 +16,9 @@
     git clone https://github.com/zy969/streaming-data-quality-validation.git
     ```
 
-2. Download Datasets:
+2. Upload Datasets: (传好了，不用运行)
     ```bash
-    python download_datasets.py
+    python  upload_file_to_gcp.py 
     ```
 
 3. Build the Docker image:
@@ -44,10 +44,18 @@ docker push vic033/data-quality-validation:latest
     docker ps
     ```
 
+docker logs streaming-data-quality-validation-consumer-1 
+
 3. To stop and remove containers:
     ```bash
     docker-compose down
     ```
+
+
+docker rmi $(docker images -q)
+
+
+
 
 parquet schema dataset/fhv_tripdata_2023-01.parquet
 
@@ -92,17 +100,6 @@ parquet schema dataset/fhv_tripdata_2023-01.parquet
 }
 
 
-
-docker-compose stop
-docker rmi $(docker images -q)
-
-docker logs streaming-data-quality-validation-consumer-1  
-
-docker logs 1-kafka-1
-docker logs 1-producer-1
-docker logs 1-consumer-1  
-docker logs 1-zookeeper-1
-docker logs 1-manager-1  
 
 
 

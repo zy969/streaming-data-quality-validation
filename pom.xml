@@ -23,6 +23,30 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+            <version>2.34.0</version> 
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud.bigdataoss</groupId>
+            <artifactId>gcs-connector</artifactId>
+            <version>1.6.4-hadoop2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>0.25.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api</groupId>
+            <artifactId>gax</artifactId>
+            <version>1.65.0</version>
+        </dependency>
+
+
+
+ 
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.13.0</version>
@@ -32,8 +56,6 @@
             <artifactId>jackson-module-scala_2.11</artifactId>
             <version>2.13.0</version>
         </dependency>
-
-        
         
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -83,11 +105,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api-scala_2.11</artifactId>
             <version>13.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

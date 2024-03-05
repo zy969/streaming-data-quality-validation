@@ -5,7 +5,7 @@ FROM maven:3.8.4-openjdk-8 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-COPY dataset ./dataset 
+
 
 # Build the project
 RUN mvn clean package
@@ -24,7 +24,10 @@ WORKDIR /
 # Copy built JAR and script files
 COPY --from=build /app/target/data-quality-validation-1.0-jar-with-dependencies.jar data-quality-validation-1.0.jar
 COPY --from=build /app/wait-for-it.sh .
-COPY --from=build /app/dataset ./dataset 
+
+
+# Copy Google Cloud key file
+COPY thermal-formula-416221-d4e3524907bf.json /
 
 # Define the entrypoint command
 CMD ./wait-for-it.sh $ZOOKEEPER_SERVER && ./wait-for-it.sh $KAFKA_SERVER && java -Xmx512m -jar data-quality-validation-1.0.jar

@@ -21,10 +21,19 @@ import org.apache.logging.log4j.LogManager;
 import java.io.File;
 import java.io.IOException; 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.auth.oauth2.GoogleCredentials;
+import java.io.FileInputStream;
+import com.google.api.gax.paging.Page;
+
 
 
 
@@ -33,48 +42,69 @@ public class Producer {
     private static final String KAFKA_TOPIC = "topic";
     private static final String ZOOKEEPER_SERVER = "zookeeper:32181";
     private static final String KAFKA_SERVER = "kafka:9092";
+    private static final String JSON_KEY_PATH = "thermal-formula-416221-d4e3524907bf.json";
+
     // Thread pool
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void main(String[] args) {
-        createKafkaTopic();
-
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(loadProducerProperties())) {
-            File datasetsDirectory = new File("dataset");
-            logger.debug("Looking for files in directory: " + datasetsDirectory.getAbsolutePath());
-
-            File[] files = datasetsDirectory.listFiles();
-            if (files != null && files.length > 0) {
-                logger.debug("Found " + files.length + " files in dataset directory.");
-
-                for (File file : files) {
-                    logger.debug("Processing file: " + file.getName());
-
-                    if (file.getName().endsWith(".parquet")) {
-                        Path path = new Path(file.getAbsolutePath());
-
-                        // Read and process each Parquet file
+        try {
+            createKafkaTopic();
+    
+            GoogleCredentials credentials = null;
+            try (FileInputStream serviceAccountStream = new FileInputStream(JSON_KEY_PATH)) {
+                credentials = GoogleCredentials.fromStream(serviceAccountStream);
+            } catch (IOException e) {
+                logger.error("Failed to load Google credentials: ", e);
+                return;
+            }
+    
+            Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+            String bucketName = "streaming-data-quality-validation";
+    
+            try (KafkaProducer<String, String> producer = new KafkaProducer<>(loadProducerProperties())) {
+                Page<Blob> blobs = storage.list(bucketName);
+                for (Blob blob : blobs.iterateAll()) {
+                    String fileName = blob.getName();
+                    if (fileName.endsWith(".parquet")) {
+                        logger.debug("Processing file: " + fileName);
+    
+                        Path path = new Path("gs://" + bucketName + "/" + fileName);
+                   
                         try (ParquetReader<Group> reader = ParquetReader.builder(new GroupReadSupport(), path).build()) {
                             Group record;
+
                             while ((record = reader.read()) != null) {
-                                // Send each record to Kafka
-                                 String jsonRecord = convertGroupToJson(record);
-                                sendRecordToKafka(producer, jsonRecord);
+                                //Convert the record to JSON string
+                                String json = convertGroupToJson(record);
+                                // Send the JSON string to Kafka
+                                sendRecordToKafka(producer, json);                
                             }
+                            logger.debug("Finished processing Parquet file: " + fileName);
+                        } catch (IOException e) {
+                            logger.error("Error reading Parquet file from GCS: ", e);
                         }
-                    } else {
-                        logger.warn("Skipping non-parquet file: " + file.getName());
                     }
                 }
-            } else {
-                logger.error("No files found in dataset directory.");
+            }  finally {
+                executorService.shutdown();
+                try {
+                    if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                        executorService.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executorService.shutdownNow();
+                }
             }
-        } catch (IOException e) {
-            logger.error("Error reading Parquet file: ", e);
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred: ", e);
+        } catch (Throwable t) {
+            logger.error("A severe error occurred: ", t);
         }
-        executorService.shutdown();
     }
+    
+    
 
     // Check and create Kafka topic
     private static void createKafkaTopic() {

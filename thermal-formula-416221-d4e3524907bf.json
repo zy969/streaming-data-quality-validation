@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "thermal-formula-416221",
+  "private_key_id": "d4e3524907bf88f8d652c125a36467591f0b9292",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDWJ8E+CIJHgICA\njfU2QgRx191IKuB71BQNjIGD5X3PY/yUcvmruPhD2O2LtCXjVVCAgZw5cx7SEPEJ\nj4kcQi9Mj5oefd66QyEHvkfpIyiKUrybolbVZMtn8oTu/WM7WAsTjhbdByKJO8Nr\nJ1olds88JGMSdOS5OzLZFojSOmj6kF2/jKiD6G5ykW85mmVERs36ppr+7RCmLMA7\nTQP+QBWwbtP+PrDh4DziizNSc4/wI9skxTtIvXMzeLIDI3Fp8hmRHgHZO7qnzuob\n+cBaKrmiLFR/vcyCl/nFdav+nuRb67SBBBQTWvLSqqiV3e4WMS8LzUG94Br+z22u\nOVScCMCdAgMBAAECggEAARGNcGlTJrQioIa/ITLlTrvCFDdnhW0bFQ7F6bsf7H5K\nSJlfuBTms8ZZ9ewdSHGyEyTJIH1CBbdkQ1eaThQ4G+Sdkqnonpspe0es9zKKNHaM\n2hEEEVaxjQkXfIlwNwDfMduEqwaN96ZQqpcKL31toySx4ojoq0oJmITy83v56ulM\ndv3PDBkkRtmhy7ZevuKKr+JVNkMLsgLlR1g/3d9YEWwCslwrjkkLYJG03o47jXeT\nm5rNhQwRHEADEAf8pDzPO1ao2E+AIkE15WtjGDppRLWEc0Tti2uWfNP3w6LdG6B4\ndFi98GCqOF2b5njvgDpaq9dW2aIGrMjRbkE7i/G+2QKBgQD3SzQSVWM1SMm4OGt8\nyjGDUfWZkcrLXmu4yzCX40S1g1mJnkv4yGXgk/d4uPLCI/uw6ISmiXKhnTt/Nd/8\n7JD1sLv8LD6MBgVPoW0scBZizo3xuNmqfsTcmIQSCDrpuMU7RcFlsN/Vw0RL+3UR\ntER+dSCDBeA664qTIs4ta9F7FQKBgQDdseH6oWbVgc8jiG/V/MptrIvB4k9Zju9t\nFYfBEdiAzbv4mSm0cOpGvW/iuV5s0dHg6/WoZ46tdCb4eHYy9u/nFUD+B0b3M/Zf\nivaK6OGz1eBJP6WxwZUTSqbBAT57fM+gaPkiZMLBsdZRBh4bQWRGK1osqYmwNEsR\nbSHCCuVxaQKBgGHEc6PD6mMIkeepNqWxcn3Oi2DZiOl6PPBkNKP4EBQLB/0mfjav\nU8fD+BTcWe1zOHCqnLcSpCVM+lbCv/lItc7MvqVmAJxvTO48jeMBtXf+3ZNxV2zW\njZIBIkXWxyPcDu3uGBXSJcxnVLsNgS0srd+pAt+KFSp2MOUW35iJhdo5AoGADwJd\nD0/gG3JnaLty/uTXe6dj6uN8hc60jQkZIMwpgUbsg/8yoKHIarOmoI32Q53M/NJc\n1mL0eO/VN5tIPVkUkuuQc+JgPppJAtzwpiTwKvG+9paVjDxT8HNsaMLBzTB9Chox\nS8/Qk7aLkP6+CRBbTpjeyQlNZh2UO4DM+Ustj4kCgYAtTuhaEgtm5SaNmeghF+mW\nexKIvMUxR51Zh3VQRkVGAPkfQFta0cI82IJtYA2NIWHlLCK4/pwX7dIGqwTkWzO3\npYGzCSFp+/7WXxEMcySzhUgrvrVPFfI3LzTqq77ik0o6ntW5rUZSUOB2oVwdxuv4\nPwifrAHESyw/QeDbWjvfUA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "streaming-data-quality-validat@thermal-formula-416221.iam.gserviceaccount.com",
+  "client_id": "102134093931498525010",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streaming-data-quality-validat%40thermal-formula-416221.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
