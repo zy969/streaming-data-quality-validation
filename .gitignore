@@ -27,5 +27,4 @@ replay_pid*
 # Ignore .vscode folder
 /.vscode
 
-
 .metals/metals.lock.db
