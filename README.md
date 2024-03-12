@@ -1,30 +1,43 @@
 # Streaming Data Quality Validation
 
+## Overview
+
+This project aims to validate the quality of streaming data in real-time, using NYC Taxi Rides datasets as a case study. It leverages the power of Kafka for streaming, Flink for data processing, and [StreamDQ](https://github.com/stefan-grafberger/StreamDQ) for data quality validation, ensuring high-quality training data for modern ML applications.
+
 ## Requirements
 
+- Docker
+- Docker-compose
 - Python 3
 - Java 11
 - Scala
 - Maven
-- Docker
-- [StreamDQ](https://github.com/stefan-grafberger/StreamDQ)
 
-## Setup
+## Framework
+
+- Kafka (for streaming)
+- Flink (for processing)
+- [StreamDQ](https://github.com/stefan-grafberger/StreamDQ) (for data quality validation)
+
+
+## Usage
 
 1. Clone the repository:
     ```bash
     git clone https://github.com/zy969/streaming-data-quality-validation.git
     ```
 
-2. Upload Datasets: (传好了，不用运行)
+2. Automatically download the 2023 NYC Taxi Rides datasets and upload them to Google Cloud Storage: 
     ```bash
-    python  upload_file_to_gcp.py 
+    python upload_file_to_gcp.py 
     ```
 
 3. Build the Docker image:
     ```bash
     docker build --no-cache -t data-quality-validation .
     ```
+
+（更改代码后Push镜像:）
     ```bash
     docker tag data-quality-validation:latest vic033/data-quality-validation:latest
     ```
@@ -32,36 +45,28 @@
     docker push vic033/data-quality-validation:latest
     ```
 
-
-## Usage
-
-
-1. Run Docker Containers:
+4. Run Docker Containers:
     ```bash
     docker-compose up -d
     ```
 
-2. To check running containers:
+5. To monitor the logs of the running containers:
     ```bash
-    docker ps
-    ```
-    ```bash
-    docker logs streaming-data-quality-validation-consumer-1 
+    docker-compose logs
     ```
 
-3. To stop and remove containers:
+6. To stop and remove containers:
     ```bash
     docker-compose down
     ```
 
+(移除所有镜像)
+    ```bash
+    docker rmi $(docker images -q)
+    ```
 
-docker rmi $(docker images -q)
 
-
-
-
-parquet schema dataset/fhv_tripdata_2023-01.parquet
-
+数据结构：
 {
   "type" : "record",
   "name" : "schema",
