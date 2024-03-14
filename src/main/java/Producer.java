@@ -79,7 +79,15 @@ public class Producer {
                                 //Convert the record to JSON string
                                 String json = convertGroupToJson(record);
                                 // Send the JSON string to Kafka
-                                sendRecordToKafka(producer, json);                
+                                sendRecordToKafka(producer, json);
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                    logger.error("Interrupted while sleeping between Kafka messages", e);
+                                    // Optional: Decide how to handle interruption (e.g., break out of the loop)
+                                    break;
+                                }
                             }
                             logger.debug("Finished processing Parquet file: " + fileName);
                         } catch (IOException e) {
@@ -137,6 +145,7 @@ public class Producer {
     }
 
     // Send record to Kafka
+    // Send record to Kafka with a 1-second delay after each send
     private static void sendRecordToKafka(KafkaProducer<String, String> producer, String record) {
         executorService.submit(() -> producer.send(new ProducerRecord<>(KAFKA_TOPIC, record), new Callback() {
             @Override
@@ -144,73 +153,181 @@ public class Producer {
                 if (e != null) {
                     logger.error("Failed to send record to Kafka", e);
                 } else {
-                    //logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
+                    logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
                 }
             }
         }));
     }
 
+
     private static String convertGroupToJson(Group record) {
+//        green_tripdata.parquet
+//        VendorID int32
+//        lpep_pickup_datetime datetime64[us]
+//        lpep_dropoff_datetime datetime64[us]
+//        store_and_fwd_flag object
+//        RatecodeID float64
+//        PULocationID int32
+//        DOLocationID int32
+//        passenger_count float64
+//        trip_distance float64
+//        fare_amount float64
+//        extra float64
+//        mta_tax float64
+//        tip_amount float64
+//        tolls_amount float64
+//        ehail_fee float64
+//        improvement_surcharge float64
+//        total_amount float64
+//        payment_type float64
+//        trip_type float64
+//        congestion_surcharge float64
         ObjectNode jsonNode = objectMapper.createObjectNode();
 
         // Handle nullable string fields
-        if (record.getBinary("dispatching_base_num", 0) != null) {
-            jsonNode.put("dispatching_base_num", record.getString("dispatching_base_num", 0));
+        if (record.getBinary("store_and_fwd_flag", 0) != null) {
+            jsonNode.put("store_and_fwd_flag", record.getString("store_and_fwd_flag", 0));
         } else {
-            jsonNode.putNull("dispatching_base_num");
-        }
-
-        if (record.getBinary("Affiliated_base_number", 0) != null) {
-            jsonNode.put("Affiliated_base_number", record.getString("Affiliated_base_number", 0));
-        } else {
-            jsonNode.putNull("Affiliated_base_number");
+            jsonNode.putNull("store_and_fwd_flag");
         }
 
         // Handle nullable long fields with logicalType timestamp-micros
         try {
-            long pickupDatetime = record.getLong("pickup_datetime", 0);
-            jsonNode.put("pickup_datetime", pickupDatetime);
+            Long lpep_pickup_datetime = record.getLong("lpep_pickup_datetime", 0);
+            jsonNode.put("lpep_pickup_datetime", lpep_pickup_datetime);
         } catch (RuntimeException e) {
-            jsonNode.putNull("pickup_datetime");
+            jsonNode.putNull("lpep_pickup_datetime");
         }
 
         try {
-            long dropOffDatetime = record.getLong("dropOff_datetime", 0);
-            jsonNode.put("dropOff_datetime", dropOffDatetime);
+            Long lpep_dropoff_datetime = record.getLong("lpep_dropoff_datetime", 0);
+            jsonNode.put("lpep_dropoff_datetime", lpep_dropoff_datetime);
         } catch (RuntimeException e) {
-            jsonNode.putNull("dropOff_datetime");
+            jsonNode.putNull("lpep_dropoff_datetime");
         }
 
         // Handle nullable double fields
         try {
-            Double PUlocationID = record.getDouble("PUlocationID", 0);
-            if(PUlocationID != null) {
-                jsonNode.put("PUlocationID", PUlocationID);
-            } else {
-                jsonNode.putNull("PUlocationID");
-            }
+            Double RateCodeID = record.getDouble("RateCodeID", 0);
+            jsonNode.put("RateCodeID", RateCodeID);
         } catch (RuntimeException e) {
-            jsonNode.putNull("PUlocationID");
+            jsonNode.putNull("RateCodeID");
         }
 
         try {
-            Double DOlocationID = record.getDouble("DOlocationID", 0);
-            if(DOlocationID != null) {
-                jsonNode.put("DOlocationID", DOlocationID);
-            } else {
-                jsonNode.putNull("DOlocationID");
-            }
+            Double passenger_count = record.getDouble("passenger_count", 0);
+            jsonNode.put("passenger_count", passenger_count);
         } catch (RuntimeException e) {
-            jsonNode.putNull("DOlocationID");
+            jsonNode.putNull("passenger_count");
         }
+
+        try {
+            Double trip_distance = record.getDouble("trip_distance", 0);
+            jsonNode.put("trip_distance", trip_distance);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("trip_distance");
+        }
+
+        try {
+            Double fare_amount = record.getDouble("fare_amount", 0);
+            jsonNode.put("fare_amount", fare_amount);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("fare_amount");
+        }
+
+        try {
+            Double extra = record.getDouble("extra", 0);
+            jsonNode.put("extra", extra);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("extra");
+        }
+
+        try {
+            Double mta_tax = record.getDouble("mta_tax", 0);
+            jsonNode.put("mta_tax", mta_tax);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("mta_tax");
+        }
+
+        try {
+            Double tip_amount = record.getDouble("tip_amount", 0);
+            jsonNode.put("tip_amount", tip_amount);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("tip_amount");
+        }
+
+        try {
+            Double tolls_amount = record.getDouble("tolls_amount", 0);
+            jsonNode.put("tolls_amount", tolls_amount);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("tolls_amount");
+        }
+
+        try {
+            Double ehail_fee = record.getDouble("ehail_fee", 0);
+            jsonNode.put("ehail_fee", ehail_fee);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("ehail_fee");
+        }
+
+        try {
+            Double improvement_surcharge = record.getDouble("improvement_surcharge", 0);
+            jsonNode.put("improvement_surcharge", improvement_surcharge);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("improvement_surcharge");
+        }
+
+        try {
+            Double total_amount = record.getDouble("total_amount", 0);
+            jsonNode.put("total_amount", total_amount);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("total_amount");
+        }
+
+        try {
+            Double payment_type = record.getDouble("payment_type", 0);
+            jsonNode.put("payment_type", payment_type);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("payment_type");
+        }
+
+        try {
+            Double trip_type = record.getDouble("trip_type", 0);
+            jsonNode.put("trip_type", trip_type);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("trip_type");
+        }
+
+        try {
+            Double congestion_surcharge = record.getDouble("congestion_surcharge", 0);
+            jsonNode.put("congestion_surcharge", congestion_surcharge);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("congestion_surcharge");
+        }
+
 
         // Handle nullable int fields
         try {
-            Integer srFlag = record.getInteger("SR_Flag", 0);
-            jsonNode.put("SR_Flag", srFlag);
+            Integer VendorID = record.getInteger("VendorID", 0);
+            jsonNode.put("VendorID", VendorID);
         } catch (RuntimeException e) {
-            jsonNode.putNull("SR_Flag");
+            jsonNode.putNull("VendorID");
         }
+
+        try {
+            Integer PULocationID = record.getInteger("PULocationID", 0);
+            jsonNode.put("PULocationID", PULocationID);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("PULocationID");
+        }
+
+        try {
+            Integer DOLocationID = record.getInteger("DOLocationID", 0);
+            jsonNode.put("DOLocationID", DOLocationID);
+        } catch (RuntimeException e) {
+            jsonNode.putNull("DOLocationID");
+        }
+
 
         // Convert the JSON object to a string
         try {

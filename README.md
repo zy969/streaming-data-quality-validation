@@ -55,7 +55,12 @@ This project aims to validate the quality of streaming data in real-time, using 
     docker-compose logs
     ```
 
-6. To stop and remove containers:
+6. To track the real-time logs of the running consumer:
+    ```bash
+    docker-compose logs -f consumer
+    ```
+
+7. To stop and remove containers:
     ```bash
     docker-compose down
     ```
@@ -66,47 +71,33 @@ This project aims to validate the quality of streaming data in real-time, using 
     ```
 
 
-数据结构：
-{
-  "type" : "record",
-  "name" : "schema",
-  "fields" : [ {
-    "name" : "dispatching_base_num",
-    "type" : [ "null", "string" ],
-    "default" : null
-  }, {
-    "name" : "pickup_datetime",
-    "type" : [ "null", {
-      "type" : "long",
-      "logicalType" : "timestamp-micros"
-    } ],
-    "default" : null
-  }, {
-    "name" : "dropOff_datetime",
-    "type" : [ "null", {
-      "type" : "long",
-      "logicalType" : "timestamp-micros"
-    } ],
-    "default" : null
-  }, {
-    "name" : "PUlocationID",
-    "type" : [ "null", "double" ],
-    "default" : null
-  }, {
-    "name" : "DOlocationID",
-    "type" : [ "null", "double" ],
-    "default" : null
-  }, {
-    "name" : "SR_Flag",
-    "type" : [ "null", "int" ],
-    "default" : null
-  }, {
-    "name" : "Affiliated_base_number",
-    "type" : [ "null", "string" ],
-    "default" : null
-  } ]
-}
+## 数据结构：
+//        green_tripdata.parquet
+//        VendorID int32
+//        lpep_pickup_datetime datetime64[us]
+//        lpep_dropoff_datetime datetime64[us]
+//        store_and_fwd_flag object
+//        RatecodeID float64
+//        PULocationID int32
+//        DOLocationID int32
+//        passenger_count float64
+//        trip_distance float64
+//        fare_amount float64
+//        extra float64
+//        mta_tax float64
+//        tip_amount float64
+//        tolls_amount float64
+//        ehail_fee float64
+//        improvement_surcharge float64
+//        total_amount float64
+//        payment_type float64
+//        trip_type float64
+//        congestion_surcharge float64
 
+
+## Change logs
+
+- 3.14 修改了适合green_tripdata.parquet的Producer中的convertGroupToJson方法和发送每条record会间隔1000ms来模拟数据流
 
 
 
