@@ -13,6 +13,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.scala.Logging
 
+
 import java.util.Properties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
@@ -23,6 +24,7 @@ import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrat
 import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck
 import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
 import com.stefan_grafberger.streamdq.VerificationSuite
+import java.time.{ZoneId, ZonedDateTime}
 
 case class TaxiRide(
   dispatching_base_num: Option[String],
@@ -44,6 +46,10 @@ class FlinkConsumer extends RichFlatMapFunction[String, Tuple2[String, Integer]]
   override def flatMap(value: String, out: Collector[Tuple2[String, Integer]]): Unit = {
     logger.info(s"Received string: $value")
     // 添加数据质量验证的代码
+      val dt = new Datatest(value, new Datatype)
+    println(value.getClass)
+
+
     out.collect(new Tuple2(value, 1))
   }
 
