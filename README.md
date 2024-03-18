@@ -38,12 +38,11 @@ This project aims to validate the quality of streaming data in real-time, using 
     ```
 
 （更改代码后Push镜像:）
-    ```bash
+
     docker tag data-quality-validation:latest vic033/data-quality-validation:latest
-    ```
-    ```bash
+
     docker push vic033/data-quality-validation:latest
-    ```
+
 
 4. Run Docker Containers:
     ```bash
@@ -54,6 +53,12 @@ This project aims to validate the quality of streaming data in real-time, using 
     ```bash
     docker-compose logs
     ```
+查看容器：
+docker ps
+
+查看consumer：
+docker logs streaming-data-quality-validation-consumer-1
+
 
 6. To track the real-time logs of the running consumer:
     ```bash
