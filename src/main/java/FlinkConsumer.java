@@ -41,14 +41,14 @@ public class FlinkConsumer {
         qualityCheck.print();
         try {
         //use checker
-        /*logger.info("```````````````````hello1``````````````````````");
+        logger.info("```````````````````hello1``````````````````````");
         Validation valid = new Validation(env, kafkaStream);
         logger.info("```````````````````hello2``````````````````````");
         List<RowLevelCheckResult<String>> res =valid.getRes();
         logger.info("```````````````````hello3``````````````````````");
         logger.info(res.toString());
         logger.info("```````````````````hello4``````````````````````");
-        */
+
             // Execute the Flink job
             env.execute("Flink Consumer");
             logger.info("Flink consumer execution started.");
