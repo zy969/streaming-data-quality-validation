@@ -6,14 +6,17 @@ import time
 service_account_key_file = 'thermal-formula-416221-d4e3524907bf.json'
 bucket_name = 'streaming-data-quality-validation'
 
+# Initialize Google Cloud Storage client 
 storage_client = storage.Client.from_service_account_json(service_account_key_file)
 bucket = storage_client.bucket(bucket_name)
 
 def file_exists_in_gcp(file_name):
+    """Check if a file exists in the GCP bucket."""
     blob = bucket.blob(file_name)
     return blob.exists()
 
 def upload_file_to_gcp(file_name, data, max_retries=10):
+    """Upload a file to GCP with retries."""
     retries = 0
     while retries < max_retries:
         try:
@@ -29,19 +32,21 @@ def upload_file_to_gcp(file_name, data, max_retries=10):
     print(f"Failed to upload {file_name} after {max_retries} attempts.")
     return False
 
+# URL of the page 
 url = 'https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page'
 response = requests.get(url)
 web_content = response.text
 
+# Filter links for files with 'parquet', '2023', and 'green' in their href attribute
 soup = BeautifulSoup(web_content, 'html.parser')
 links = soup.find_all('a', href=True)
-
-download_links = [link['href'] for link in links if 'parquet' in link['href'].lower() and '2023' in link['href']]
+download_links = [link['href'] for link in links if 'parquet' in link['href'].lower() and '2023' in link['href'] and 'green' in link['href'].lower()]
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 }
 
+# Iterate through the filtered download links
 for link in download_links:
     file_name = link.split('/')[-1]
     if file_exists_in_gcp(file_name):
