@@ -5,7 +5,7 @@ import com.stefan_grafberger.streamdq.checks.RowLevelCheckResult
 import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
 import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
-import org.apache.flink.types.Row
+import org.apache.logging.log4j.LogManager
 import java.math.BigDecimal
 
 data class TaxiRideData @JvmOverloads constructor(
@@ -32,18 +32,22 @@ data class TaxiRideData @JvmOverloads constructor(
 )
 
 class Validation(var env: StreamExecutionEnvironment, var stream: DataStream<String>){
+    fun getRes() : List<RowLevelCheckResult<String>>
+    {
+        val logger = LogManager.getLogger(Validation::class.java);
+        logger.info("```````````````````````````get res start")
         var data_out_of_range: String = "Data_out_of_range"
         var data_invalid_value: String = "Data_invalid_value"
 
 
         val checker1 = RowLevelCheck()
             .isInRange("PULocationID", BigDecimal.valueOf(1), BigDecimal.valueOf(263))
+        logger.info("```````````````````````````checker1")
         val verificationResult = VerificationSuite().onDataStream(stream, env.config)
             .addRowLevelCheck(checker1)
             .build()
-
-    fun getRes() : List<RowLevelCheckResult<String>>
-    {
+        logger.info("```````````````````````````verification builded")
+        logger.info("``````````````````````````````returning");
         return TestUtils.collectRowLevelResultStreamAndAssertLen(verificationResult, checker1, 10)
     }
 }

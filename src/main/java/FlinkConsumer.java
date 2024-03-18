@@ -39,14 +39,16 @@ public class FlinkConsumer {
         // Apply a flatMap transformation
         DataStream<Tuple2<String, Integer>> qualityCheck = kafkaStream.flatMap(new DataQualityValidator());
         qualityCheck.print();
-
-        //use checker
-        Validation valid = new Validation(env, kafkaStream);
-        List<RowLevelCheckResult<String>> res =valid.getRes();
-        logger.info("```````````````````hello``````````````````````");
-        logger.info(res.toString());
-        logger.info("```````````````````hello``````````````````````");
         try {
+        //use checker
+        /*logger.info("```````````````````hello1``````````````````````");
+        Validation valid = new Validation(env, kafkaStream);
+        logger.info("```````````````````hello2``````````````````````");
+        List<RowLevelCheckResult<String>> res =valid.getRes();
+        logger.info("```````````````````hello3``````````````````````");
+        logger.info(res.toString());
+        logger.info("```````````````````hello4``````````````````````");
+        */
             // Execute the Flink job
             env.execute("Flink Consumer");
             logger.info("Flink consumer execution started.");
