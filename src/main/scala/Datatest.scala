@@ -1,29 +1,6 @@
 package consumer
 
-import java.time.{ZoneId, ZonedDateTime}
-import org.apache.flink.api.common.functions.RichFlatMapFunction
-import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
-import org.apache.flink.api.common.serialization.SimpleStringSchema
-import org.apache.flink.api.java.utils.ParameterTool
-import org.apache.flink.streaming.api.datastream.DataStream
-import org.apache.flink.api.java.tuple.Tuple2
-import org.apache.flink.util.Collector
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.scala.Logging
-
-import java.util.Properties
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.stefan_grafberger.streamdq.VerificationSuite
-import com.stefan_grafberger.streamdq.anomalydetection.detectors.aggregatedetector.AggregateAnomalyCheck
-import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrategy
-import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck
-import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
-import com.stefan_grafberger.streamdq.VerificationSuite
+import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck;
 
 class Datatype {
   var VendorID: Int = 0
@@ -57,6 +34,9 @@ class Datatest(val value: String, val types: Datatype) {
     val keyValue = part.split(":")
     if (keyValue.length == 2) Some(keyValue(1)) else None
   }.flatten
+
+
+
   //data validate
   data1.store_and_fwd_flag = extractedData(0)
   data1.lpep_pickup_datetime = extractedData(1).toLong

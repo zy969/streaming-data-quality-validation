@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/streaming-data-quality-validation.iml" filepath="$PROJECT_DIR$/.idea/streaming-data-quality-validation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/data-quality-validation.iml" filepath="$PROJECT_DIR$/data-quality-validation.iml" />
     </modules>
   </component>
 </project>
