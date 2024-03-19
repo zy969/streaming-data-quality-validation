@@ -1,7 +1,6 @@
 package consumer;
 
-import com.stefan_grafberger.streamdq.checks.RowLevelCheckResult;
-import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck;
+import com.stefan_grafberger.streamdq.VerificationSuite;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -9,6 +8,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
+import org.apache.flink.types.Row;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.flink.util.Collector;
 import org.apache.logging.log4j.LogManager;
@@ -35,11 +35,13 @@ public class FlinkConsumer {
         // Add Kafka consumer as a source
         DataStream<String> kafkaStream = env.addSource(kafkaConsumer);
         logger.info("Started consuming data from Kafka.");
-
+        try {
         // Apply a flatMap transformation
         DataStream<Tuple2<String, Integer>> qualityCheck = kafkaStream.flatMap(new DataQualityValidator());
         qualityCheck.print();
-        try {
+
+        //Validation valid = new Validation(env, kafkaStream);
+        /* put here can only do it once
         //use checker
         logger.info("```````````````````hello1``````````````````````");
         Validation valid = new Validation(env, kafkaStream);
@@ -48,6 +50,7 @@ public class FlinkConsumer {
         logger.info("```````````````````hello3``````````````````````");
         logger.info(res.toString());
         logger.info("```````````````````hello4``````````````````````");
+        */
 
             // Execute the Flink job
             env.execute("Flink Consumer");
@@ -67,7 +70,14 @@ public class FlinkConsumer {
         @Override
         public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
             // 实现数据质量验证逻辑
-
+            //
+            logger.info("```````````````````hello1``````````````````````");
+            Validation valid = new Validation(value);
+            logger.info("```````````````````hello2``````````````````````");
+            //List<RowLevelCheckResult<String>> res =valid.getRes();
+            logger.info("```````````````````hello3``````````````````````");
+            //logger.info(res.toString());
+            logger.info("```````````````````hello4``````````````````````");
             logger.info("Received string: " + value);
         }
 
