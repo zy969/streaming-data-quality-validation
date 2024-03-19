@@ -26,8 +26,12 @@ public class Main {
             // Asynchronously run Flink consumer
             executor.submit(() -> {
                 logger.info("Starting Flink consumer...");
-                FlinkConsumer.main(new String[]{});
-                logger.debug("Flink consumer started successfully.");
+                try {
+                    FlinkConsumer.main(new String[]{});
+                    logger.debug("Flink consumer started successfully.");
+                } catch (Exception e) {
+                    logger.error("An error occurred during Flink consumer execution: ", e);
+                }
             });
 
             executor.shutdown(); 
