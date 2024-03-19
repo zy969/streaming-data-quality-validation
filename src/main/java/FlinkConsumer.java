@@ -45,7 +45,7 @@ public class FlinkConsumer {
         public void processElement(String jsonString, Context ctx, Collector<String> out) throws Exception {
             // 行级检查：确保乘客计数在0到5之间
 
-            //VerificationSuite verificationResult = new VerificationSuite();
+            Validation v= new Validation(jsonString);
 
             //RowLevelCheck rowLevelCheck = new RowLevelCheck()
             //.isInRange("passenger_count", BigDecimal.valueOf(0.0), BigDecimal.valueOf(5.0));

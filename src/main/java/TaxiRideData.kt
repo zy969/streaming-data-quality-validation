@@ -45,7 +45,7 @@ class Validation(var value:String){
         logger.info("~~~~~~~Data cleaned")
         val env = StreamExecutionEnvironment.createLocalEnvironment(TestUtils.LOCAL_PARALLELISM)
         val tempoStream = env.fromElements(t_Data)
-        logger.info("env & steam newed")
+        logger.info("~~~~~~~~~~~~env & steam newed")
         val  rowLevelCheck = com.stefan_grafberger.streamdq.checks.row.RowLevelCheck()
             //.isInRange("PULocationID", BigDecimal.valueOf(1), BigDecimal.valueOf(263))
             //.isInRange("DOLocationID", BigDecimal.valueOf(1), BigDecimal.valueOf(263))
