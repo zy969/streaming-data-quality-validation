@@ -31,14 +31,6 @@ services:
         aliases:
           - kafka
   
-  manager:
-    image: sheepkiller/kafka-manager:latest
-    environment:
-      ZK_HOSTS: "zookeeper:32181"
-    ports:
-      - 9000:9000
-    networks:
-      - bridge
 
   producer:
     image: data-quality-validation
@@ -50,7 +42,7 @@ services:
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
       PRODUCER_INTERVAL: 100
-      GOOGLE_APPLICATION_CREDENTIALS: /thermal-formula-416221-d4e3524907bf.json
+      GOOGLE_APPLICATION_CREDENTIALS: /key.json
     networks:
       - bridge
 
@@ -63,6 +55,6 @@ services:
       KAFKA_TOPIC: "topic"
       KAFKA_SERVER: "kafka:9092"
       ZOOKEEPER_SERVER: "zookeeper:32181"
-      GOOGLE_APPLICATION_CREDENTIALS: /thermal-formula-416221-d4e3524907bf.json
+      GOOGLE_APPLICATION_CREDENTIALS: /key.json
     networks:
       - bridge

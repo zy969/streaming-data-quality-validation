@@ -1,48 +1,56 @@
 package producer;
 
-import kafka.admin.AdminUtils;
-import kafka.admin.RackAwareMode;
-import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
-import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.ZkConnection;
-import org.apache.hadoop.fs.Path; 
-import org.apache.parquet.hadoop.ParquetReader; 
-import org.apache.parquet.example.data.Group; 
-import org.apache.parquet.hadoop.example.GroupReadSupport; 
+// Kafka Admin Client
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.admin.NewTopic;
+
+// Kafka Producer
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.internals.Topic;
 import org.apache.kafka.common.serialization.StringSerializer;
+
+// Logging
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+// Hadoop and Parquet
+import org.apache.hadoop.fs.Path; 
+import org.apache.parquet.hadoop.ParquetReader; 
+import org.apache.parquet.example.data.Group; 
+import org.apache.parquet.hadoop.example.GroupReadSupport; 
+
+// Utilities
 import java.io.File;
-import java.io.IOException; 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+// JSON Processing
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+// Google Cloud Storage
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
 import com.google.auth.oauth2.GoogleCredentials;
-import java.io.FileInputStream;
 import com.google.api.gax.paging.Page;
-
 
 
 
 public class Producer {
     private static final Logger logger = LogManager.getLogger(Producer.class);
     private static final String KAFKA_TOPIC = "topic";
-    private static final String ZOOKEEPER_SERVER = "zookeeper:32181";
     private static final String KAFKA_SERVER = "kafka:9092";
-    private static final String JSON_KEY_PATH = "thermal-formula-416221-d4e3524907bf.json";
+    private static final String JSON_KEY_PATH = "key.json";
 
     // Thread pool
     private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
@@ -85,7 +93,7 @@ public class Producer {
                                 } catch (InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                     logger.error("Interrupted while sleeping between Kafka messages", e);
-                                    // Optional: Decide how to handle interruption (e.g., break out of the loop)
+                                   
                                     break;
                                 }
                             }
@@ -116,22 +124,14 @@ public class Producer {
 
     // Check and create Kafka topic
     private static void createKafkaTopic() {
-        ZkClient zkClient = null;
-        try {
-            zkClient = new ZkClient(ZOOKEEPER_SERVER, 20000, 20000, ZKStringSerializer$.MODULE$);
-            ZkUtils zkUtils = new ZkUtils(zkClient, new ZkConnection(ZOOKEEPER_SERVER), false);
-            if (!AdminUtils.topicExists(zkUtils, KAFKA_TOPIC)) {
-                AdminUtils.createTopic(zkUtils, KAFKA_TOPIC, 1, 1, new Properties(), RackAwareMode.Safe$.MODULE$);
-                logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
-            } else {
-                logger.info("Kafka topic " + KAFKA_TOPIC + " already exists.");
-            }
+        Properties config = new Properties();
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SERVER);
+        try (AdminClient admin = AdminClient.create(config)) {
+            NewTopic newTopic = new NewTopic(KAFKA_TOPIC, 1, (short) 1); // Topic name, number of partitions, number of replicas
+            admin.createTopics(Collections.singleton(newTopic)).all().get();
+            logger.info("Kafka topic " + KAFKA_TOPIC + " created.");
         } catch (Exception e) {
             logger.error("Exception occurred while creating Kafka topic: ", e);
-        } finally {
-            if (zkClient != null) {
-                zkClient.close();
-            }
         }
     }
 
@@ -153,7 +153,7 @@ public class Producer {
                 if (e != null) {
                     logger.error("Failed to send record to Kafka", e);
                 } else {
-                    logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
+                    //logger.debug("Record sent to Kafka topic: " + metadata.topic() + " with offset: " + metadata.offset());
                 }
             }
         }));

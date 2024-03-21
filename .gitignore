@@ -26,5 +26,8 @@ replay_pid*
 
 # Ignore .vscode folder
 /.vscode
-
 .metals/metals.lock.db
+
+# Ignore .idea folder
+/.idea
+.idea/libraries/streamdq_1_0_SNAPSHOT.xml

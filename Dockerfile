@@ -1,33 +1,20 @@
-# Stage 1: Build Stage
-FROM maven:3.8.4-openjdk-8 AS build
-
-# Copy Maven project files
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-
-
-# Build the project
-RUN mvn clean package
-COPY wait-for-it.sh /app/
-RUN chmod +x wait-for-it.sh
-
-# Stage 2: Production Stage
+# Use base image
 FROM openjdk:8u151-jdk-alpine3.7
 
-# Install required packages
+# Install necessary packages
 RUN apk add --no-cache bash libc6-compat
 
 # Set working directory
 WORKDIR /
 
-# Copy built JAR and script files
-COPY --from=build /app/target/data-quality-validation-1.0-jar-with-dependencies.jar data-quality-validation-1.0.jar
-COPY --from=build /app/wait-for-it.sh .
+# Copy build artifacts and other necessary files
+COPY target/data-quality-validation-1.0-jar-with-dependencies.jar data-quality-validation-1.0.jar
+COPY scripts/wait-for-it.sh .
+COPY key.json /
+COPY src/main/resources/log4j2.xml /
 
+# Grant execution permissions to scripts
+RUN chmod +x wait-for-it.sh
 
-# Copy Google Cloud key file
-COPY thermal-formula-416221-d4e3524907bf.json /
-
-# Define the entrypoint command
+# Define startup command
 CMD ./wait-for-it.sh $ZOOKEEPER_SERVER && ./wait-for-it.sh $KAFKA_SERVER && java -Xmx512m -jar data-quality-validation-1.0.jar
