@@ -36,15 +36,10 @@ This project aims to validate the quality of streaming data in real-time, using 
     ```
 
 
-
-
 3. Build the Docker image and run Docker Containers:
     ```bash
-    chmod +x ./scripts/build-and-run.sh
     ./scripts/build-and-run.sh
     ```
-
-
 
 
 4. To monitor the logs of the running containers:
@@ -68,13 +63,14 @@ docker ps
     ```
 
 (移除所有镜像)
-    ```bash
-    docker rmi -f $(docker images -q)
-    ```
+docker rmi -f $(docker images -q)
+
 
 ## 故障排查
 
 - mvn package阶段报错，检查mvn --version是否为java11。streamdq找不到类，检查自己本地maven仓库是否包含streamdq-1.0-SNAPSHOT.jar。如果不存在，用java11进行安装。如果存在，用我们仓库里的streamdq-1.0-SNAPSHOT.jar把它替换掉
+
+- permission denied类问题：需保证 ./scripts/build-and-run.sh 有执行权限
 
 - bash问题：检查sh脚本是否都是lf而不是crlf
 
