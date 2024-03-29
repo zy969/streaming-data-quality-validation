@@ -53,13 +53,17 @@ public class Producer {
     private static final String JSON_KEY_PATH = "key.json";
 
     // Thread pool
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(10); 
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
+    
     public static void main(String[] args) {
+        processAndSendData();
+    }
+
+    private static void processAndSendData() {
         try {
             createKafkaTopic();
-    
+
             GoogleCredentials credentials = null;
             try (FileInputStream serviceAccountStream = new FileInputStream(JSON_KEY_PATH)) {
                 credentials = GoogleCredentials.fromStream(serviceAccountStream);
@@ -67,17 +71,17 @@ public class Producer {
                 logger.error("Failed to load Google credentials: ", e);
                 return;
             }
-    
+
             Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
             String bucketName = "streaming-data-quality-validation";
-    
+
             try (KafkaProducer<String, String> producer = new KafkaProducer<>(loadProducerProperties())) {
                 Page<Blob> blobs = storage.list(bucketName);
                 for (Blob blob : blobs.iterateAll()) {
                     String fileName = blob.getName();
                     if (fileName.endsWith(".parquet")) {
                         logger.debug("Processing file: " + fileName);
-    
+
                         Path path = new Path("gs://" + bucketName + "/" + fileName);
                    
                         try (ParquetReader<Group> reader = ParquetReader.builder(new GroupReadSupport(), path).build()) {
@@ -103,7 +107,7 @@ public class Producer {
                         }
                     }
                 }
-            }  finally {
+            } finally {
                 executorService.shutdown();
                 try {
                     if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
@@ -119,7 +123,6 @@ public class Producer {
             logger.error("A severe error occurred: ", t);
         }
     }
-    
     
 
     // Check and create Kafka topic
@@ -145,7 +148,6 @@ public class Producer {
     }
 
     // Send record to Kafka
-    // Send record to Kafka with a 1-second delay after each send
     private static void sendRecordToKafka(KafkaProducer<String, String> producer, String record) {
         executorService.submit(() -> producer.send(new ProducerRecord<>(KAFKA_TOPIC, record), new Callback() {
             @Override
@@ -161,27 +163,7 @@ public class Producer {
 
 
     private static String convertGroupToJson(Group record) {
-//        green_tripdata.parquet
-//        VendorID int32
-//        lpep_pickup_datetime datetime64[us]
-//        lpep_dropoff_datetime datetime64[us]
-//        store_and_fwd_flag object
-//        RatecodeID float64
-//        PULocationID int32
-//        DOLocationID int32
-//        passenger_count float64
-//        trip_distance float64
-//        fare_amount float64
-//        extra float64
-//        mta_tax float64
-//        tip_amount float64
-//        tolls_amount float64
-//        ehail_fee float64
-//        improvement_surcharge float64
-//        total_amount float64
-//        payment_type float64
-//        trip_type float64
-//        congestion_surcharge float64
+
         ObjectNode jsonNode = objectMapper.createObjectNode();
 
         // Handle nullable string fields

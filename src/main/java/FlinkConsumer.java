@@ -14,9 +14,6 @@ import com.stefan_grafberger.streamdq.anomalydetection.detectors.aggregatedetect
 import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrategy;
 import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck;
 
-import com.stefan_grafberger.streamdq.anomalydetection.detectors.aggregatedetector.AggregateAnomalyCheck;
-import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrategy;
-import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck;
 import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck;
 import com.stefan_grafberger.streamdq.VerificationSuite;
 

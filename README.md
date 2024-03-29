@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project aims to validate the quality of streaming data in real-time, using NYC Taxi Rides datasets as a case study. It leverages the power of Kafka for streaming, Flink for data processing, and [StreamDQ](https://github.com/stefan-grafberger/StreamDQ) for data quality validation, ensuring high-quality training data for modern ML applications.
+This project aims to validate the quality of streaming data in real-time, using NYC Taxi Rides datasets as a case study. It leverages the power of Kafka for streaming, Flink for data processing, and [StreamDQ](https://github.com/stefan-grafberger/StreamDQ) for data quality validation, ensuring high-quality training data for modern data-driven applications.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ This project aims to validate the quality of streaming data in real-time, using 
 
 
 ## Framework
-
+- Google Cloud Storage (for data storage)
 - Kafka (for streaming)
 - Flink (for processing)
 - [StreamDQ](https://github.com/stefan-grafberger/StreamDQ) (for data quality validation)
@@ -30,7 +30,7 @@ This project aims to validate the quality of streaming data in real-time, using 
     git clone https://github.com/zy969/streaming-data-quality-validation.git
     ```
 
-2. Automatically download the NYC Taxi Rides datasets and upload them to Google Cloud Storage: 
+2. Automatically download the datasets and upload them to Google Cloud Storage: 
     ```bash
     python ./scripts/upload-file-to-gcp.py 
     ```
@@ -40,7 +40,7 @@ This project aims to validate the quality of streaming data in real-time, using 
     ```bash
     ./scripts/build-and-run.sh
     ```
-
+To ensure a smooth execution of the script, please make sure all the requirements listed in the [Requirements](#requirements) section are properly installed on your system.
 
 4. To monitor the logs of the running containers:
     ```bash
