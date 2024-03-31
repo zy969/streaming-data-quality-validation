@@ -47,13 +47,13 @@ To ensure a smooth execution of the script, please make sure all the requirement
     docker-compose logs
     ```
 
-(查看consumer)
+EN:(Check Consumer)/CN:(查看Consumer)
 
 docker logs streaming-data-quality-validation-consumer-1
 
 docker-compose logs -f consumer
 
-(查看容器)
+EN:(Check Containers)/CN:(查看容器)
 docker ps
 
 
@@ -62,11 +62,21 @@ docker ps
     docker-compose down
     ```
 
-(移除所有镜像)
+EN:(Remove all images)/ CN:(移除所有镜像)
 docker rmi -f $(docker images -q)
 
 
-## 故障排查
+## EN:Frequent issues
+
+- In stage of mvn package, if there is an error.1.Use 'mvn --version' to insure your JAVA version is 11.  2. Can't find class 'Streamdq', check local maven repo to make sure 'streamdq-1.0-SNAPSHOT.jar' exists. If not, install it with java 11 using repo 'stefan_grafberger/StreamDQ'. If it exist, then replace it with our modified streamdq to replace the local repo's.
+
+- permission denied: Make sure you have permission to run it.
+
+- bash issue: Check your shell is CRLF format
+
+- In order to pull docker image, you need to login in and join our docker group.
+
+## CN:故障排查
 
 - mvn package阶段报错，检查mvn --version是否为java11。streamdq找不到类，检查自己本地maven仓库是否包含streamdq-1.0-SNAPSHOT.jar。如果不存在，用java11进行安装。如果存在，用我们仓库里的streamdq-1.0-SNAPSHOT.jar把它替换掉
 
@@ -77,8 +87,7 @@ docker rmi -f $(docker images -q)
 - dockerhub需是登陆状态，docker info检查
 
 
-
-## 数据结构：
+## EN: Data types/ CN:数据结构
 //        green_tripdata.parquet
 //        VendorID int32
 //        lpep_pickup_datetime datetime64[us]
