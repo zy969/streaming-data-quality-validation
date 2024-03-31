@@ -62,6 +62,7 @@ public class FlinkConsumer {
                 logger.debug("Initialized validation.");
 
                 VerificationSuite verificationSuite = new VerificationSuite();
+
                 RowLevelCheck rowLevelCheck = new RowLevelCheck()
                 .isInRange("passenger_count", BigDecimal.valueOf(0.0), BigDecimal.valueOf(5.0));
 
