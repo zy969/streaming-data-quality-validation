@@ -64,7 +64,7 @@ class Validation(var value:String){
             .isInRange("fare_amount")
             .isInRange("total_amount")
             .onTimeOrder("lpep_pickup_datetime", "lpep_dropoff_datetime")
-
+            .isTotaled("total_amount","fare_amount", "extra","mta_tax","tip_amount","tolls_amount","improvement_surcharge")
         logger.info("check made")
 
         val verificationResult = VerificationSuite()
