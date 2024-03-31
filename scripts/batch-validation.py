@@ -1,4 +1,5 @@
 import great_expectations as ge
+import numpy as np
 import pandas as pd
 import tempfile
 import time
@@ -14,7 +15,7 @@ BUCKET_NAME = "streaming-data-quality-validation"
 # Data field names
 pickup_column_name = 'lpep_pickup_datetime'
 dropoff_column_name = 'lpep_dropoff_datetime'
-amount_columns = ['improvement_surcharge', 'mta_tax', 'extra', 'tolls_amount', 'tip_amount', 'fare_amount', 'total_amount']
+amount_columns = ['improvement_surcharge', 'extra', 'congestion_surcharge', 'mta_tax', 'tolls_amount', 'tip_amount', 'fare_amount', 'total_amount']
 vendor_id_column = 'VendorID'
 store_and_fwd_flag_column = 'store_and_fwd_flag'
 pu_location_id_column = 'PULocationID'
@@ -38,7 +39,7 @@ def validate_df(df):
         parse_strings_as_datetimes=True
     )
 
-    # Validate amount columns to be greater than or equal to zero
+    # Validate amount columns are greater than or equal to zero
     for column in amount_columns:
         df_ge.expect_column_values_to_be_between(column, min_value=0, max_value=None)
 
@@ -51,13 +52,16 @@ def validate_df(df):
     df_ge.expect_column_values_to_be_between(do_location_id_column, min_value=1, max_value=265)
     df_ge.expect_column_values_to_be_between(passenger_count_column, min_value=0, max_value=6)
 
-    # Custom validation for total_amount
-    def custom_total_amount_condition(row):
-        expected_total = sum([row[col] for col in amount_columns if col != 'total_amount'])
-        return abs(row['total_amount'] - expected_total) < 0.01
+    expected_totals = df['fare_amount'] + df['extra'] + df['mta_tax'] + \
+                      df['tolls_amount'] + df['tip_amount'] + \
+                      df['improvement_surcharge'] + df['congestion_surcharge']
+    df['valid_total_amount'] = np.isclose(df['total_amount'], expected_totals, atol=0.01)
 
-    valid_total_amount = df.apply(custom_total_amount_condition, axis=1)
-    df_ge.expect_column_values_to_be_in_set('total_amount', valid_total_amount)
+    # Validate the new column only contains True
+    df_ge.expect_column_values_to_be_in_set('valid_total_amount', [True])
+
+    # You can drop the auxiliary column after validation if you don't want to alter the original dataframe structure
+    df.drop(columns='valid_total_amount', inplace=True)
 
     return df_ge.validate()
 
@@ -98,3 +102,4 @@ throughput = total_rows / total_latency
 
 print(f"\nValidated {total_rows} rows across files in {total_latency} seconds.")
 print(f"Row throughput: {throughput} rows/second.")
+
