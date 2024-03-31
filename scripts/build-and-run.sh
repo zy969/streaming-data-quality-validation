@@ -18,3 +18,6 @@ docker push vic033/data-quality-validation:latest) &&
 docker-compose up -d) &&
 
 echo "Build-and-run completed！"
+
+# Step 4: Display the report by another program
+. ./scripts/start-server.sh
