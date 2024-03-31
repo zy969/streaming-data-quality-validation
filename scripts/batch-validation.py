@@ -14,7 +14,7 @@ BUCKET_NAME = "streaming-data-quality-validation"
 # Data field names
 pickup_column_name = 'lpep_pickup_datetime'
 dropoff_column_name = 'lpep_dropoff_datetime'
-amount_columns = ['improvement_surcharge', 'mta_tax', 'tolls_amount', 'tip_amount', 'fare_amount', 'total_amount']
+amount_columns = ['improvement_surcharge', 'mta_tax', 'extra', 'tolls_amount', 'tip_amount', 'fare_amount', 'total_amount']
 vendor_id_column = 'VendorID'
 store_and_fwd_flag_column = 'store_and_fwd_flag'
 pu_location_id_column = 'PULocationID'
