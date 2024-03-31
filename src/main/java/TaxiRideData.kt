@@ -1,10 +1,10 @@
 package consumer
 
-import com.stefan_grafberger.streamdq.TestUtils
 import com.stefan_grafberger.streamdq.VerificationSuite
 import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.logging.log4j.LogManager
+import java.math.BigDecimal
 
 data class TaxiRideData @JvmOverloads constructor(
     var store_and_fwd_flag: String? = "",
@@ -25,8 +25,8 @@ data class TaxiRideData @JvmOverloads constructor(
     var trip_type: Double ? = 0.0,
     var congestion_surcharge: Double ? = 0.0,
     var VendorID: Int ? = 0,
-    var PULocationID:Int ? = 0,
-    var DOLocationID:Int ? = 0
+    var PULocationID:Long ? = 0,
+    var DOLocationID:Long ? = 0
 )
 
 class Validation(var value:String){
@@ -43,39 +43,36 @@ class Validation(var value:String){
         logger.info(eData[0])
         this.t_Data = convertToTaxiRideData(eData)
         logger.info("~~~~~~~Data cleaned")
-        val env = StreamExecutionEnvironment.createLocalEnvironment(TestUtils.LOCAL_PARALLELISM)
+        val env = StreamExecutionEnvironment.createLocalEnvironment(1)
         val tempoStream = env.fromElements(t_Data)
-        logger.info("~~~~~~~~~~~~env & steam newed")
-        val  rowLevelCheck = com.stefan_grafberger.streamdq.checks.row.RowLevelCheck()
-            //.isInRange("PULocationID", BigDecimal.valueOf(1), BigDecimal.valueOf(263))
-            //.isInRange("DOLocationID", BigDecimal.valueOf(1), BigDecimal.valueOf(263))
-            //.isComplete("store_and_fwd_flag")
-            /*.isComplete("lpep_pickup_datetime")
-            .isComplete("RateCodeID")
-            .isComplete("passenger_count")
-            .isComplete("trip_distance")
-            .isComplete("fare_amount")
-            .isComplete("extra")
-            .isComplete("mta_tax")
-            .isComplete("tip_amount")
-            .isComplete("tolls_amount")
-            .isComplete("ehail_fee")
-            .isComplete("improvement_surcharge")
-            .isComplete("total_amount")
-            .isComplete("payment_type")
-            .isComplete("trip_type")
-            .isComplete("congestion_surcharge")
-            .isComplete("VendorID")
+        logger.info("~~~~~~~~~~~~env & stream newed")
+        val  rowLevelCheck = RowLevelCheck()
             .isComplete("PULocationID")
-            .isComplete("DOLocationID")*/
+            .isNonNegative("improvement_surcharge")
+            .isNonNegative("mta_tax")
+            .isNonNegative("tolls_amount")
+            .isNonNegative("tip_amount")
+            .isContainedIn("VendorID", listOf(1, 2))
+            .isComplete("lpep_pickup_datetime")
+            .isComplete("lpep_dropoff_datetime")
+            .isContainedIn("store_and_fwd_flag", listOf("Y", "N"))
+            .isInRange("PULocationID", BigDecimal.valueOf(1L), BigDecimal.valueOf(265L))
+            .isInRange("DOLocationID", BigDecimal.valueOf(1L), BigDecimal.valueOf(265L))
+            .isInRange("RateCodeID", BigDecimal.valueOf(1.0) , BigDecimal.valueOf(6.0) )
+            .isInRange("passenger_count", BigDecimal.valueOf(0.0) , BigDecimal.valueOf(6.0) )
+            .isInRange("trip_distance")
+            .isInRange("fare_amount")
+            .isInRange("total_amount")
+            .onTimeOrder("lpep_pickup_datetime", "lpep_dropoff_datetime")
+
         logger.info("check made")
 
-        val verificationResult = VerificationSuite().onDataStream(tempoStream, env.config)
+        val verificationResult = VerificationSuite()
+            .onDataStream(tempoStream, env.config)
             .addRowLevelCheck(rowLevelCheck)
             .build()
         logger.info("~~~~~~~~~~~~~~veri build done")
-        val result = TestUtils.collectRowLevelResultStreamAndAssertLen(verificationResult, rowLevelCheck, 10)
-
+        val result = Utils.collectRowLevelResultStream(verificationResult, rowLevelCheck)
         logger.info("~~~~~~~~~~~~~~res:"+result.toString())
     }
 
@@ -99,8 +96,8 @@ class Validation(var value:String){
             trip_type = data.getOrNull(15)?.toDoubleOrNull() ?: 0.0,
             congestion_surcharge = data.getOrNull(16)?.toDoubleOrNull() ?: 0.0,
             VendorID = data.getOrNull(17)?.toIntOrNull() ?: 0,
-            PULocationID = data.getOrNull(18)?.toIntOrNull() ?: 0,
-            DOLocationID = data.getOrNull(19)?.toIntOrNull() ?: 0
+            PULocationID = data.getOrNull(18)?.toLongOrNull() ?: 0L,
+            DOLocationID = data.getOrNull(19)?.toLongOrNull() ?: 0L
         )
     }
 
