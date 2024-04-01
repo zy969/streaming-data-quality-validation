@@ -5,6 +5,7 @@ import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.logging.log4j.LogManager
 import java.math.BigDecimal
+import com.stefan_grafberger.streamdq.checks.RowLevelCheckResult
 
 data class TaxiRideData @JvmOverloads constructor(
     var store_and_fwd_flag: String? = "",
@@ -32,6 +33,7 @@ data class TaxiRideData @JvmOverloads constructor(
 class Validation(var value:String){
     var logger = LogManager.getLogger(Validation::class.java)
     var t_Data: TaxiRideData? = null
+    var result:List<RowLevelCheckResult<TaxiRideData?>> = emptyList()
     init {
         logger.info("~~~~~~~Contruct entered")
         val cleanedData = value.replace("[{}\"]".toRegex(), "")
@@ -72,7 +74,7 @@ class Validation(var value:String){
             .addRowLevelCheck(rowLevelCheck)
             .build()
         logger.info("~~~~~~~~~~~~~~veri build done")
-        val result = Utils.collectRowLevelResultStream(verificationResult, rowLevelCheck)
+        this.result = Utils.collectRowLevelResultStream(verificationResult, rowLevelCheck)
         logger.info("~~~~~~~~~~~~~~res:"+result.toString())
     }
 
@@ -99,6 +101,10 @@ class Validation(var value:String){
             PULocationID = data.getOrNull(18)?.toLongOrNull() ?: 0L,
             DOLocationID = data.getOrNull(19)?.toLongOrNull() ?: 0L
         )
+    }
+
+    fun getRes(): List<RowLevelCheckResult<TaxiRideData?>>{
+        return result
     }
 
     fun parseDoubleOrNull(str: String): Double? {

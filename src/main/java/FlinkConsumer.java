@@ -1,39 +1,27 @@
 package consumer;
 
+import com.stefan_grafberger.streamdq.checks.RowLevelCheckResult;
+import io.opencensus.trace.Link;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
-
-import com.stefan_grafberger.streamdq.anomalydetection.detectors.aggregatedetector.AggregateAnomalyCheck;
-import com.stefan_grafberger.streamdq.anomalydetection.strategies.DetectionStrategy;
-import com.stefan_grafberger.streamdq.checks.aggregate.AggregateCheck;
-import com.stefan_grafberger.streamdq.checks.row.RowLevelCheck;
 import com.stefan_grafberger.streamdq.VerificationSuite;
-
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 
 public class FlinkConsumer {
     private static final Logger logger = LogManager.getLogger(FlinkConsumer.class);
-
+    public static List<List<RowLevelCheckResult<TaxiRideData>>> res = new LinkedList<>();
     public static void main(String[] args) {
         try {
             logger.info("Starting Flink Consumer application...");
@@ -52,11 +40,16 @@ public class FlinkConsumer {
             logger.info("Created Kafka Consumer.");
 
             env.addSource(kafkaConsumer)
-                    .process(new StreamDQValidator());
+                    .process(new StreamDQValidator(res));
             logger.info("Added Kafka Consumer as source to the environment.");
 
             env.execute("Flink Consumer with StreamDQ Validation");
             logger.info("Flink Consumer application started.");
+
+            logger.info("~~~~~~~~~~~~~~res~~~~~~~~~~~~~~~~~~~~~~~~~");
+            logger.info(res.toString());
+            logger.info("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
         } catch (Exception e) {
             logger.error("An error occurred during the execution of the Flink Consumer application", e);
         }
@@ -68,6 +61,10 @@ public class FlinkConsumer {
         private transient long totalLatency;
         private transient int latencyRecordCount;
 
+        public List<List<RowLevelCheckResult<TaxiRideData>>> sub_res = null;
+        StreamDQValidator(List<List<RowLevelCheckResult<TaxiRideData>>> res){
+            this.sub_res = new LinkedList<>(res);
+        }
         @Override
         public void open(Configuration parameters) throws Exception {
             lastTimeWindow = System.currentTimeMillis();
@@ -88,7 +85,7 @@ public class FlinkConsumer {
                 logger.debug("Initialized validation.");
 
                 VerificationSuite verificationSuite = new VerificationSuite();
-
+                this.sub_res.add(validation.getRes());
 
 
                 long endProcessingTime = System.currentTimeMillis();

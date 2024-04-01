@@ -20,4 +20,4 @@ docker-compose up -d) &&
 echo "Build-and-run completed！"
 
 # Step 4: Display the report by another program
-. ./scripts/start-server.sh
+#. ./scripts/start-server.sh
