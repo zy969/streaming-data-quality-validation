@@ -46,8 +46,7 @@ public class FlinkConsumer {
             props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-consumer-group");
             logger.info("Kafka consumer properties set.");
 
-            FlinkKafkaConsumer<String> kafkaConsumer = new FlinkKafkaConsumer<>("topic", new SimpleStringSchema(),
-                    props);
+            FlinkKafkaConsumer<String> kafkaConsumer = new FlinkKafkaConsumer<>("topic", new SimpleStringSchema(), props);
 
             logger.info("Created Kafka Consumer.");
 
@@ -83,13 +82,9 @@ public class FlinkConsumer {
             try {
                 recordCount++;
                 Validation validation = new Validation(jsonString);
-
-                // 行级检查：确保乘客计数在0到5之间
                 logger.debug("Initialized validation.");
 
                 VerificationSuite verificationSuite = new VerificationSuite();
-
-
 
                 long endProcessingTime = System.currentTimeMillis();
                 long latency = endProcessingTime - startProcessingTime;
@@ -97,20 +92,20 @@ public class FlinkConsumer {
                 latencyRecordCount++;
 
                 long now = System.currentTimeMillis();
-                if (now - lastTimeWindow >= 1000) { // 每1000毫秒（1秒）计算一次吞吐量和平均延迟
+                if (now - lastTimeWindow >= 1000) { // Calculate throughput and average latency every 1000 milliseconds (1 second)
                     double averageLatency = latencyRecordCount == 0 ? 0 : (double) totalLatency / latencyRecordCount;
                     logger.info("Throughput (records per second): {}, Average Latency: {} ms", recordCount,
                             averageLatency);
 
-                    // 重置计数器、总延迟和时间窗口
+                    // Reset counters, total latency, and time window
                     recordCount = 0;
                     totalLatency = 0;
                     latencyRecordCount = 0;
                     lastTimeWindow = now;
                 }
-                // 将数据原样输出
-                out.collect(jsonString);
-                logger.debug("Element processed and collected: {}", jsonString);
+                // Output data (Debug):
+                //out.collect(jsonString);
+                //logger.debug("Element processed and collected: {}", jsonString);
             } catch (Exception e) {
                 logger.error("Error processing element with StreamDQValidator", e);
                 throw new RuntimeException("Error processing element with StreamDQValidator", e);

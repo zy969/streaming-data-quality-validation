@@ -9,9 +9,9 @@ mvn clean package -X &&
 docker build --no-cache -t data-quality-validation .) &&
 
 # Push the Docker image to the repository
-(echo "Pushing Docker image to repository..." &&
-docker tag data-quality-validation:latest vic033/data-quality-validation:latest &&
-docker push vic033/data-quality-validation:latest) &&
+# (echo "Pushing Docker image to repository..." &&
+# docker tag data-quality-validation:latest vic033/data-quality-validation:latest &&
+# docker push vic033/data-quality-validation:latest) &&
 
 # Step 3: Start the containers 
 (echo "Starting Docker containers..." &&
