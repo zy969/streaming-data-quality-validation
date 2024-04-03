@@ -19,4 +19,4 @@ docker-compose up -d) &&
 
 echo "Build-and-run completed！"
 
-. ./scripts/start-server.sh
+# . ./scripts/start-server.sh
