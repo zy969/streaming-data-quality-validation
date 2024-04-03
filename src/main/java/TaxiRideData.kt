@@ -73,9 +73,28 @@ class Validation(var value:String){
             .onDataStream(tempoStream, env.config)
             .addRowLevelCheck(rowLevelCheck)
             .build()
-        logger.info("~~~~~~~~~~~~~~veri build done")
         this.result = Utils.collectRowLevelResultStream(verificationResult, rowLevelCheck)
-        logger.info("~~~~~~~~~~~~~~res:"+result.toString())
+        
+        val rowCount = result.count { result -> result.checkedObject is NestedClickInfo2 }
+        println("total checked count:"+ rowCount.toString())
+        for((index,cons) in rowLevelCheck.constraints.withIndex())
+        {
+            println("Constraint: ${cons}")
+            val sub_res = result
+                .filter { result -> !result.constraintResults!![index].outcome!! }
+                val sub_size:Double = sub_res.size.toDouble()
+                val percentage:Double = sub_size/rowCount.toDouble()
+                println("this sub reslut has "+ sub_size + " anomalies, percentage:"+percentage.toString())
+                sub_res.take(sub_res.size)
+                .forEach { result ->
+                    val clickInfo = result.checkedObject
+                    val constraintResult = result.constraintResults!![index]
+                    //println("Value: ${clickInfo?.getVal()}, Outcome: ${constraintResult.outcome}")
+                }
+            
+        }
+
+
     }
 
     fun convertToTaxiRideData(data: List<String>): TaxiRideData {
