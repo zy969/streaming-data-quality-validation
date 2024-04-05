@@ -24,7 +24,7 @@ This project aims to validate the quality of streaming data in real-time, using 
 
 ## Datasets
 
-Our experiments rely on the NYC green taxi trip records datasets spanning 2019 to 2023. These datasets provide a comprehensive view of taxi activities in New York City, uncovering travel patterns, fare insights, and service usage. We automate the download and upload of these datasets to Google Cloud Storage using the script [`upload-file-to-gcp.py`](https://github.com/zy969/streaming-data-quality-validation/blob/main/scripts/upload-file-to-gcp.py).
+Our experiments rely on the NYC green taxi trip records datasets spanning from July 2022 to December 2023. These datasets provide a comprehensive view of taxi activities in New York City, uncovering travel patterns, fare insights, and service usage. We automate the download and upload of these datasets to Google Cloud Storage using the script [`upload-file-to-gcp.py`](https://github.com/zy969/streaming-data-quality-validation/blob/main/scripts/upload-file-to-gcp.py).
 
 ## Usage
 
@@ -35,7 +35,7 @@ To ensure a smooth execution, please make sure all the requirements listed in th
     git clone https://github.com/zy969/streaming-data-quality-validation.git
     ```
 
-2. Replace the local Maven `streamdq` JAR with our modified version from [`src/main/resources/lib/streamdq-1.0-SNAPSHOT.jar`](https://github.com/zy969/streaming-data-quality-validation/blob/main/src/main/resources/lib/streamdq-1.0-SNAPSHOT.jar).
+2. Replace the local Maven `streamdq` JAR with our modified version from [`src/main/resources/lib/streamdq-1.0-SNAPSHOT.jar`](https://github.com/zy969/streaming-data-quality-validation/blob/main/src/main/resources/lib/streamdq-1.0-SNAPSHOT.jar) and update [`key.json`](https://github.com/zy969/streaming-data-quality-validation/blob/main/key.json) with your own Google Cloud key.
 
 3. Build the Docker image and run Docker Containers:
     ```bash
